@@ -1,4 +1,5 @@
+DEFAULT_LANG = 'es'
 bannedUsers = []
 debugginMode = False
-botOwner = 'bruno_xc'
+BOT_OWNER = 6390834871
 muteStatus = False

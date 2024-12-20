@@ -1,7 +1,7 @@
-DEFAULT_LANG = 'en'
+from params import DEFAULT_LANG
 
-def messages_get(user) :
-    msgs = langs_dict[user.language_code]
+def messages_get(lang) :
+    msgs = langs_dict[lang]
     if not msgs :
         msgs = langs_dict[DEFAULT_LANG]
     return msgs
@@ -9,7 +9,7 @@ def messages_get(user) :
 def commands_text_generator(commands) :
     result = "Commands: \n"
     for key in commands:  # generate help text out of the commands dictionary defined at the top
-        result += "/" + key + ": "
+        result += "/" + key + " — "
         result += commands[key] + "\n"
     return result
 
@@ -31,8 +31,8 @@ class Messages :
     help_commands_text =    lambda commands: commands_text_generator(commands)
     ban_info =              "Keep in mind that misuse of the bot such as spam can lead to a temporal ban"
     start =                 "Welcome to my bot!"
-    muted =                 "Muted"
-    unmuted =               "Unmuted"
+    muted =                 "Muted. I will no longer answer to messages I don't understand"
+    unmuted =               "Unmuted. I will tell you if I don't understand a message"
     quit =                  "Type y to close the bot"
     quitted =               "Terminating program..."
     quit_cancel =           "Bot closing cancelled"
@@ -49,8 +49,8 @@ es_msgs.help_intro_text =       "Descripción del bot"
 es_msgs.help_commands_text =    lambda commands: commands_text_generator(commands)
 es_msgs.ban_info =              "Ten en cuenta que abusar del bot, como mediante spam, puede resultar en un ban temporal"
 es_msgs.start =                 "Bienvenido a mi bot!"
-es_msgs.muted =                 "Muteado"
-es_msgs.unmuted =               "Desmuteado"
+es_msgs.muted =                 "Muteado. Ya no voy a responderte si no entiendo un mensaje"
+es_msgs.unmuted =               "Desmuteado. Voy a avisarte si no entiendo un mensaje"
 es_msgs.quit =                  "Escribe y para apagar el bot"
 es_msgs.quitted =               "Terminando programa..."
 es_msgs.quit_cancel =           "Apagado de bot cancelado"
