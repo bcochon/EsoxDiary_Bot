@@ -1,5 +1,3 @@
 DEFAULT_LANG = 'es'
-bannedUsers = []
-debugginMode = False
+LOGGER_CONFIG_PATH = '../logs/.conf'
 BOT_OWNER = 6390834871
-muteStatus = False

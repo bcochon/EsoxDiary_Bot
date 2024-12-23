@@ -1,6 +1,8 @@
 import time
 import threading
 
+from utils import logger
+
 users = {}
 
 class CustomUserInfo:
@@ -27,7 +29,7 @@ class CustomUserInfo:
 
     def ban(self, banTime):
         self.banned = True
-        print(f"User {self.uid} banned")
+        logger.info(f"Banned user {self.uid}")
         thread = threading.Thread(target=self.unban, args=(banTime,))
         thread.start()
 
@@ -49,3 +51,12 @@ def check_spam(id):
 
 def check_banned(id):
     return register_user(id).banned
+
+def get_user_step(uid):
+    if uid not in users:
+        register_user(uid)
+        logger.debug(f"New user {uid} detected, who hasn't used \"/start\" yet")
+    return users[uid].step
+
+def set_user_step(uid, step):
+    users[uid].step = step
