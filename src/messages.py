@@ -34,6 +34,8 @@ class Messages :
     help_commands_text =    "You can use me through this commands: \n\n" + cms_menu(language)
     ban_info =              "Keep in mind that misuse of the bot such as spam can lead to a temporal ban"
     help_ending =           'You can check the code running behind this bot <a href="https://github.com/bcochon/telegramEeveeBot">here</a>'
+    help_rec =              "For recording an entry use the /rec command. The recorded entry must contain text, which is took from the message you are answering to when sending /rec. If the /rec message is not answering to any other message, the rest of the /rec message text is used. For example, sending "+'"/rec hello</i>"'+", without answering to any other message, will record an entry with the text <i>hello</i>, but will record the text from the message its answering to if there is one"
+    help_rec_disclaimer =   "At the moment, the bot can't detect if you're answering to messages sent by you, only messages sent by other participants. If you want to record a message you sent, you'll have to edit it and add the /rec command at the beggining and then forward it to the bot chat or ask another chat participant to answer to it with the /rec command."
     start =                 "Welcome to my bot!"
     muted =                 "Muted. I will no longer answer to messages I don't understand"
     unmuted =               "Unmuted. I will tell you if I don't understand a message"
@@ -48,6 +50,7 @@ class Messages :
     diary_created =         "Diary created successfully. Use /rec to add an entry to the diary"
     no_diary =              "There is no diary created for this chat yet. Use /create to create a diary"
     entry_added =           "Succesfully added entry to diary"
+    rec_error =             "Ups... can't turn that message into an entry. Make sure you are correctly using /rec. "+'For more info, use "/help rec"'
     check =                 "Sending entries..."
     no_entries =            "No entries yet for this diary"
 en_msgs = Messages('en')
@@ -62,6 +65,8 @@ es_msgs.help_intro_text =       "Bienvenido a <b>EsoxDiaryBot</b>. Este bot te p
 es_msgs.help_commands_text =    "Estos son los comandos que puedes usar: \n\n" + cms_menu('es')
 es_msgs.ban_info =              "Ten en cuenta que abusar del bot, como mediante spam, puede resultar en un ban temporal"
 es_msgs.help_ending =           'Puedes encontrar el código detrás de este bot <a href="https://github.com/bcochon/telegramEeveeBot">aquí</a>'
+es_msgs.help_rec =              'Para grabar una entrada usa el comando /rec. La entrada debe contener texto, el cual se obtiene del mensaje al que respondes al enviar /rec. Si el mensaje con /rec no está respondiendo a otro, se graba el texto que acompaña al mensaje con /rec. Por ejemplo, al enviar "/rec hola", sin responder a otro mensaje, se grabará una entrada con el texto <i>hola</i>, pero si se responde a otro mensaje, se grabará en la entrada el texto del mensaje respondido'
+es_msgs.help_rec_disclaimer =   "Por el momento, el bot no puede detectar respuestas a mensajes del mismo usuario que responde, solo respuestas a otros usuarios del chat. Si quieres grabar una entrada con un mensaje propio, Tendrás que editarlo para añadir el comando /rec al comienzo del mensaje y luego reenviar el mensaje al chat del bot, o pedirle a otro participante del chat que responda al mensaje con el comando /rec."
 es_msgs.start =                 "Bienvenido a mi bot!"
 es_msgs.muted =                 "Muteado. Ya no voy a responderte si no entiendo un mensaje"
 es_msgs.unmuted =               "Desmuteado. Voy a avisarte si no entiendo un mensaje"
@@ -76,5 +81,6 @@ es_msgs.diary_already_created = "Este chat ya tiene un diario creado"
 es_msgs.diary_created =         "Diario creado correctamente. Usa /rec para añadir una entrada a este diario"
 es_msgs.no_diary =              "No hay un diario creado para este chat aún. Usa /create para crear un diario"
 es_msgs.entry_added =           "Entrada añadida al diario con éxito"
+es_msgs.rec_error =             "Ups... ese mensaje no puede convertirse en entrada. Asegúrate de estar usando correctamente el comando /rec. "+'Para más información, usa "/help rec"'
 es_msgs.check =                 "Enviando entradas..."
 es_msgs.no_entries =            "Aún no hay entradas para este diario"

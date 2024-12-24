@@ -81,6 +81,18 @@ def command_start(message : teletypes.Message):
     command_help(message)
 
 # --------- Help command -------------------------------------
+@bot.message_handler(commands=['help'], func=lambda msg: len(msg.text.split())>1)
+def command_help_rec(message : teletypes.Message):
+    args = message.text.split()
+    if args[1].lower() != 'rec':
+        return ContinueHandling
+    cid = message.chat.id
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    txt = msg.help_rec + '\n'
+    txt += msg.help_rec_disclaimer
+    bot.send_message(cid, txt, parse_mode='HTML')
+
 @bot.message_handler(commands=['help'])
 def command_help(message : teletypes.Message):
     cid = message.chat.id
@@ -170,6 +182,7 @@ def new_entry(message : teletypes.Message):
         bot.reply_to(message, msg.entry_added)
     except Exception as e:
         log_exception(e)
+        bot.reply_to(message, msg.rec_error)
 
 # --------- Modify command -------------------------------------
 @bot.message_handler(commands=['mod'])

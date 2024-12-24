@@ -16,10 +16,14 @@ class Entry :
     def __init__(self, requested_by: teletypes.User, message: teletypes.Message, is_personal: bool = True):
         self.requested_by = requested_by
         self.mid = message.id
+        self.text = message.text.replace('/rec','').replace('@EsoxDiary_bot','').strip()
         self.cid = message.chat.id
-        self.text = message.text.replace('/rec','').strip()
-        self.from_user = message.from_user
-        self.date = message.date
+        if message.forward_origin.type == 'user' :
+            self.date = message.forward_origin.date
+            self.from_user = message.forward_origin.sender_user
+        else:
+            self.date = message.date
+            self.from_user = message.from_user
         if message.reply_to_message:
             self.reply_to_user = message.reply_to_message.from_user
             self.reply_to_text = message.reply_to_message.text
