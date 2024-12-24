@@ -53,6 +53,8 @@ class Messages :
     rec_error =             "Ups... can't turn that message into an entry. Make sure you are correctly using /rec. "+'For more info, use "/help rec"'
     check =                 "Sending entries..."
     no_entries =            "No entries yet for this diary"
+    del_diary_confirm =     "Are you sure you want to delete this diary?"
+    del_diary =             "Diary deleted"
 en_msgs = Messages('en')
 
 # -------------------------------------- SPANISH --------------------------------------
@@ -84,3 +86,5 @@ es_msgs.entry_added =           "Entrada añadida al diario con éxito"
 es_msgs.rec_error =             "Ups... ese mensaje no puede convertirse en entrada. Asegúrate de estar usando correctamente el comando /rec. "+'Para más información, usa "/help rec"'
 es_msgs.check =                 "Enviando entradas..."
 es_msgs.no_entries =            "Aún no hay entradas para este diario"
+es_msgs.del_diary_confirm =     "¿Seguro que quieres eliminar este diario?"
+es_msgs.del_diary =             "Diario eliminado"

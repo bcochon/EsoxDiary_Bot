@@ -196,6 +196,7 @@ def command_deldiary(message : teletypes.Message):
     lang = message.from_user.language_code
     msg = messages_get(lang)
     get_diary(cid).delete_diary()
+    bot.send_message(cid, msg.del_diary)
 
 # --------- Delete entry command -------------------------------------
 @bot.message_handler(commands=['delentry'])
