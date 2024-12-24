@@ -1,6 +1,8 @@
 from telebot import types as teletypes
-from telebot import TeleBot
+import pickle
+import os
 from params import DEFAULT_LANG
+from params import DIARIES_PATH
 from utils import name_from_user
 from utils import log_exception
 from utils import message_date_string
@@ -49,18 +51,30 @@ class Entry :
 
 # =============================================== DIARIES ===============================================
 
-diaries_dict = {}
 
 class Diary :
     def __init__(self, chat) :
         self.cid = chat.id
+        self.entries = []
+        self.entries_by_date = {}
         diaries_dict.update({self.cid : self})
+        self.save_diary_to_file()
 
-    entries_by_date = {}
+    def q_entries(self) : len(self.entries_by_date)
 
-    def add_entry(self, requested_by: teletypes.User, message: teletypes.Message, is_personal: bool) :
-        new_entry = Entry(requested_by, message, is_personal)
-        self.date_add(new_entry)
+    def create_entry(self, requested_by: teletypes.User, message: teletypes.Message, is_personal: bool) :
+        self.add_entry(Entry(requested_by, message, is_personal))
+
+    def add_entry(self, entry : Entry) :
+        self.entries.append(entry)
+        print(f'Diary {self.cid} entries : {self.entries}')
+        self.date_add(entry)
+        self.save_diary_to_file()
+
+    def remove_entry(self, entry : Entry) :
+        self.entries.remove(entry)
+        self.date_remove(entry)
+        self.save_diary_to_file()
 
     def date_add(self, entry: Entry) :
         date = entry.date
@@ -78,6 +92,7 @@ class Diary :
     def remove_whole_date(self, date: int) :
         if date in self.entries_by_date :
             self.entries_by_date.pop(date)
+        self.save_diary_to_file()
 
     def retrieve_entries(self, date: int) :
         if date not in self.entries_by_date: return []
@@ -89,9 +104,21 @@ class Diary :
             for entry in self.entries_by_date[date] :
                 entries.append(entry)
         return entries
+    
+    def save_diary_to_file(self) :
+        cid = self.cid
+        path = f'{DIARIES_PATH}/{cid}'
+        try:
+            with open(path, 'wb') as f:
+                pickle.dump(self, f)
+        except Exception as e:
+            log_exception(e)
 
-    def remove_diary(self) :
-        diaries_dict.pop(self.cid)
+    def delete_diary(self) :
+        cid = self.cid
+        path = f'{DIARIES_PATH}/{cid}'
+        diaries_dict.pop(cid)
+        os.remove(path)
 
 
 class PrivateDiary(Diary) :
@@ -118,3 +145,24 @@ def create_diary(chat : teletypes.Chat) :
 
 def delete_diary(chat_id : int) :
     diaries_dict[chat_id].remove_diary()
+
+def get_diary_from_file(cid : int) -> PrivateDiary | GroupDiary | None :
+    path = f'{DIARIES_PATH}/{cid}'
+    try:
+        with open(path, 'rb') as f:
+            diary = pickle.load(f)
+    except Exception as e:
+        log_exception(e)
+        diary = None
+    return diary
+
+def get_diaries_from_files() -> dict :
+    diaries = {}
+    diary_files = os.listdir(DIARIES_PATH)
+    for s_cid in diary_files :
+        cid = int(s_cid)
+        diary = get_diary_from_file(cid)
+        diaries.update({cid : diary})
+    return diaries
+
+diaries_dict = get_diaries_from_files()

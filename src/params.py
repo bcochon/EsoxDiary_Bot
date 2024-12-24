@@ -1,3 +1,4 @@
 DEFAULT_LANG = 'es'
 LOGGER_CONFIG_PATH = '../logs/.conf'
+DIARIES_PATH = '../diaries'
 BOT_OWNER = 6390834871

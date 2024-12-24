@@ -164,7 +164,7 @@ def new_entry(message : teletypes.Message):
     msg = messages_get(lang)
     entry_message = message.reply_to_message
     if not entry_message : entry_message = message
-    get_diary(cid).add_entry(message.from_user, entry_message, True)
+    get_diary(cid).create_entry(message.from_user, entry_message, True)
     bot.reply_to(message, msg.entry_added)
 
 # --------- Modify command -------------------------------------
@@ -175,7 +175,10 @@ def command_modify(message : teletypes.Message):
 # --------- Delete diary command -------------------------------------
 @bot.message_handler(commands=['deldiary'])
 def command_deldiary(message : teletypes.Message):
-    default(message) #NO IMPLEMENTADO
+    cid = message.chat.id
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    get_diary(cid).delete_diary()
 
 # --------- Delete entry command -------------------------------------
 @bot.message_handler(commands=['delentry'])
