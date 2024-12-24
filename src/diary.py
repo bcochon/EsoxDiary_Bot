@@ -17,9 +17,15 @@ class Entry :
         self.requested_by = requested_by
         self.mid = message.id
         self.cid = message.chat.id
-        self.text = message.text
+        self.text = message.text.replace('/rec','').strip()
         self.from_user = message.from_user
         self.date = message.date
+        if message.reply_to_message:
+            self.reply_to_user = message.reply_to_message.from_user
+            self.reply_to_text = message.reply_to_message.text
+        else:
+            self.reply_to_user = None
+            self.reply_to_text = None
         self.type = self.define_type(message)
         if self.type != 'text' : raise Exception('Non text entries not supported yet')
 
@@ -49,6 +55,10 @@ class Entry :
         text = self.text
         requestor = name_from_user(self.requested_by)
         msgs = messages_get(language)
+        if self.reply_to_user :
+            reply_to_user = name_from_user(self.reply_to_user)
+            reply_to_text = self.reply_to_text
+            return f'{msgs.entry_text_info(date, author, text)}\n\n{msgs.entry_ending(requestor)}\n{msgs.entry_textreply_info(reply_to_user, reply_to_text)}'
         return f'{msgs.entry_text_info(date, author, text)}\n\n{msgs.entry_ending(requestor)}'
 
 

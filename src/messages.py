@@ -42,6 +42,7 @@ class Messages :
     quit_cancel =           "Bot closing cancelled"
     default =               "I didn't understand that. Use /help to know what I can do"
     entry_text_info =       lambda self, date, username, text: f'Date: {date}\n<b>{username}</b> said : "{text}"'
+    entry_textreply_info =  lambda self, username, text: f'After <b>{username}</b> said : "{text}"'
     entry_ending =          lambda self, requestor: f'<i>Entry requested by {requestor}</i>'
     diary_already_created = "This chat already has a diary created"
     diary_created =         "Diary created successfully. Use /rec to add an entry to the diary"
@@ -69,6 +70,7 @@ es_msgs.quitted =               "Terminando programa..."
 es_msgs.quit_cancel =           "Apagado de bot cancelado"
 es_msgs.default =               "No entendí lo que dijiste. Usa /help para saber qué puedo hacer"
 es_msgs.entry_text_info =       lambda date, username, text: f'Fecha: {date}\n<b>{username}</b> dijo : "{text}"'
+es_msgs.entry_textreply_info =  lambda username, text: f'Luego de que <b>{username}</b> dijera : "{text}"'
 es_msgs.entry_ending =          lambda requestor: f'<i>Entrada grabada por {requestor}</i>'
 es_msgs.diary_already_created = "Este chat ya tiene un diario creado"
 es_msgs.diary_created =         "Diario creado correctamente. Usa /rec para añadir una entrada a este diario"
