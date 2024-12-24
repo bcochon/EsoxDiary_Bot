@@ -43,6 +43,7 @@ def ignore(message : teletypes.Message):
 def test(message : teletypes.Message):
     info = message_info_string(message)
     print(info)
+    save_message_to_file(message)
 
 # --------- Debug warning ------------------------------------
 @bot.message_handler(func=lambda msg: debugginMode and not from_bot_owner(msg))

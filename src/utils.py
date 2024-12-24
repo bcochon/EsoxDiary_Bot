@@ -1,6 +1,7 @@
 from telebot import types as teletypes
 import logging
 import logging.config
+import pickle
 from params import BOT_OWNER
 from params import LOGGER_CONFIG_PATH
 from datetime import datetime
@@ -66,6 +67,14 @@ def message_info_string(message : teletypes.Message):
     for key in info:
         info_string += f'{key}: {info[key]}\n'
     return info_string
+
+def save_message_to_file(message : teletypes.Message):
+    path = 'test'
+    try:
+        with open(path, 'wb') as f:
+            pickle.dump(message, f)
+    except Exception as e:
+        log_exception(e)
 
 def from_bot_owner(message : teletypes.Message) :
     return message.from_user.id == BOT_OWNER
