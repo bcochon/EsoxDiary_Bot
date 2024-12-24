@@ -1,5 +1,6 @@
 # Ignored folders
 logs/
+diaries/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
