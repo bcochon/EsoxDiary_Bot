@@ -136,7 +136,7 @@ def retrieve_entries(message : teletypes.Message):
     cid = message.chat.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
-    bot.send_message(cid, 'Sending entries...')
+    bot.send_message(cid, msg.check)
     diary = get_diary(cid)
     entries = diary.retrieve_all_entries()
     if entries:
@@ -145,7 +145,7 @@ def retrieve_entries(message : teletypes.Message):
             reply = teletypes.ReplyParameters(message_id=entry.mid, chat_id=entry.cid)
             bot.send_message(cid, text, parse_mode='HTML', reply_parameters=reply)
     else :
-        bot.send_message(cid, 'No entries yet')
+        bot.send_message(cid, msg.no_entries)
 
 # --------- Record command -------------------------------------
 @bot.message_handler(commands=['rec'])
@@ -159,13 +159,16 @@ def command_record(message : teletypes.Message):
     
 @bot.message_handler(commands=['rec'])
 def new_entry(message : teletypes.Message):
-    cid = message.chat.id
-    lang = message.from_user.language_code
-    msg = messages_get(lang)
-    entry_message = message.reply_to_message
-    if not entry_message : entry_message = message
-    get_diary(cid).create_entry(message.from_user, entry_message, True)
-    bot.reply_to(message, msg.entry_added)
+    try:
+        cid = message.chat.id
+        lang = message.from_user.language_code
+        msg = messages_get(lang)
+        entry_message = message.reply_to_message
+        if not entry_message : entry_message = message
+        get_diary(cid).create_entry(message.from_user, entry_message, True)
+        bot.reply_to(message, msg.entry_added)
+    except Exception as e:
+        log_exception(e)
 
 # --------- Modify command -------------------------------------
 @bot.message_handler(commands=['mod'])

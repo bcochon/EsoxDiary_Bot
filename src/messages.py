@@ -41,12 +41,14 @@ class Messages :
     quitted =               "Terminating program..."
     quit_cancel =           "Bot closing cancelled"
     default =               "I didn't understand that. Use /help to know what I can do"
-    entry_text_info =       lambda self, date, username, text: f'Date: {date}\n<b>{username}</b> said : \n"{text}"'
+    entry_text_info =       lambda self, date, username, text: f'Date: {date}\n<b>{username}</b> said : "{text}"'
     entry_ending =          lambda self, requestor: f'<i>Entry requested by {requestor}</i>'
-    diary_already_created = "This chat has a diary created already"
+    diary_already_created = "This chat already has a diary created"
     diary_created =         "Diary created successfully. Use /rec to add an entry to the diary"
     no_diary =              "There is no diary created for this chat yet. Use /create to create a diary"
     entry_added =           "Succesfully added entry to diary"
+    check =                 "Sending entries..."
+    no_entries =            "No entries yet for this diary"
 en_msgs = Messages('en')
 
 # -------------------------------------- SPANISH --------------------------------------
@@ -66,3 +68,11 @@ es_msgs.quit =                  "Usa /y para confirmar apagar el bot"
 es_msgs.quitted =               "Terminando programa..."
 es_msgs.quit_cancel =           "Apagado de bot cancelado"
 es_msgs.default =               "No entendí lo que dijiste. Usa /help para saber qué puedo hacer"
+es_msgs.entry_text_info =       lambda date, username, text: f'Fecha: {date}\n<b>{username}</b> dijo : "{text}"'
+es_msgs.entry_ending =          lambda requestor: f'<i>Entrada grabada por {requestor}</i>'
+es_msgs.diary_already_created = "Este chat ya tiene un diario creado"
+es_msgs.diary_created =         "Diario creado correctamente. Usa /rec para añadir una entrada a este diario"
+es_msgs.no_diary =              "No hay un diario creado para este chat aún. Usa /create para crear un diario"
+es_msgs.entry_added =           "Entrada añadida al diario con éxito"
+es_msgs.check =                 "Enviando entradas..."
+es_msgs.no_entries =            "Aún no hay entradas para este diario"
