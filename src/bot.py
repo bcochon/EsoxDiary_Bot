@@ -14,6 +14,7 @@ from user_handler import check_banned
 from user_handler import check_spam
 from user_handler import get_user_step
 from user_handler import set_user_step
+from user_handler import UserSteps
 from diary import *
 
 load_dotenv()
@@ -190,15 +191,15 @@ def command_quit(message : teletypes.Message):
     msg = messages_get(lang)
     uid = message.from_user.id
     bot.send_message(cid, msg.quit)
-    set_user_step(uid, 2)
+    set_user_step(uid, UserSteps.QUIT)
 
-@bot.message_handler(func=lambda msg:  get_user_step(msg.from_user.id) == 2)
+@bot.message_handler(func=lambda msg:  get_user_step(msg.from_user.id) == UserSteps.QUIT)
 def command_quitted(message : teletypes.Message):
     cid = message.chat.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
     uid = message.from_user.id
-    set_user_step(uid, 0)
+    set_user_step(uid, UserSteps.DEFAULT)
     if message.text.lower() == '/y':
         try:
             bot.send_message(cid, msg.quitted)

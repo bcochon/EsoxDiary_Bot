@@ -5,6 +5,10 @@ from utils import logger
 
 users = {}
 
+class UserSteps :
+    DEFAULT = 0
+    QUIT = 1
+
 class CustomUserInfo:
     spamCount = 0
     step = 0
