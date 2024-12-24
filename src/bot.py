@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 import telebot
 from telebot import types as teletypes
+from telebot.handler_backends import ContinueHandling
 
 from messages import messages_get
 import commands
@@ -13,6 +14,7 @@ from user_handler import check_banned
 from user_handler import check_spam
 from user_handler import get_user_step
 from user_handler import set_user_step
+from diary import *
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -29,7 +31,7 @@ logger.info("Bot Online")
 # ============================================ Message handlers ============================================
 # --------- Ignore previous messages -------------------------
 @bot.message_handler(func=lambda msg: sent_secs_ago(msg, 30))
-def ignore(message):
+def ignore(message : teletypes.Message):
     user = user_from_message(message)
     date = message_date_string(message)
     logger.debug(f"Ignored message from {user} at {date}")
@@ -37,13 +39,13 @@ def ignore(message):
 
 # --------- Test ---------------------------------------------
 @bot.message_handler(commands=['test'])
-def test(message):
+def test(message : teletypes.Message):
     info = message_info_string(message)
     print(info)
 
 # --------- Debug warning ------------------------------------
 @bot.message_handler(func=lambda msg: debugginMode and not from_bot_owner(msg))
-def warn_debug(message):
+def warn_debug(message : teletypes.Message):
     lang = message.from_user.language_code
     msg = messages_get(lang).warn_debug
     bot.reply_to(message, msg)
@@ -51,7 +53,7 @@ def warn_debug(message):
 
 # --------- Spam control -------------------------------------
 @bot.message_handler(func=lambda msg: check_banned(msg.from_user.id))
-def warn_ban(message):
+def warn_ban(message : teletypes.Message):
     cid = message.from_user.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
@@ -60,7 +62,7 @@ def warn_ban(message):
 
 # --------- Banned warning -----------------------------------
 @bot.message_handler(func=lambda msg: msg.from_user.id in bannedUsers)
-def reject_user(message):
+def reject_user(message : teletypes.Message):
     cid = message.chat.id
     lang = message.from_user.language_code
     username = message.from_user.username
@@ -70,7 +72,7 @@ def reject_user(message):
 # ============================================== Commands ==================================================
 # --------- Start command ------------------------------------
 @bot.message_handler(commands=['start'])
-def command_start(message):
+def command_start(message : teletypes.Message):
     lang = message.from_user.language_code
     msg = messages_get(lang)
     bot.reply_to(message, msg.start)
@@ -78,7 +80,7 @@ def command_start(message):
 
 # --------- Help command -------------------------------------
 @bot.message_handler(commands=['help'])
-def command_help(message):
+def command_help(message : teletypes.Message):
     cid = message.chat.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
@@ -86,13 +88,12 @@ def command_help(message):
     txt += msg.help_commands_text + '\n'
     txt += msg.ban_info + '\n\n'
     txt += msg.help_ending
-    print(txt)
     bot.send_message(cid, txt, parse_mode='HTML', link_preview_options=teletypes.LinkPreviewOptions(is_disabled=True))  # send the generated help page
     check_spam(message.from_user.id)
 
 # --------- Mute command -------------------------------------
 @bot.message_handler(commands=['togglemute'])
-def command_mute(message):
+def command_mute(message : teletypes.Message):
     cid = message.chat.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
@@ -109,38 +110,81 @@ def command_mute(message):
 
 # --------- Create command -------------------------------------
 @bot.message_handler(commands=['create'])
-def command_create(message):
-    default(message) #NO IMPLEMENTADO
+def command_create(message : teletypes.Message):
+    cid = message.chat.id
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    if diary_exists(cid) :
+        bot.reply_to(message, msg.diary_already_created)
+    else :
+        create_diary(message.chat)
+        bot.reply_to(message, msg.diary_created)
 
 # --------- Check command -------------------------------------
 @bot.message_handler(commands=['check'])
-def command_check(message):
-    default(message) #NO IMPLEMENTADO
+def command_check(message : teletypes.Message):
+    cid = message.chat.id
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    if diary_exists(cid) :
+        return ContinueHandling()
+    bot.reply_to(message, msg.no_diary)
+
+@bot.message_handler(commands=['check'])
+def retrieve_entries(message : teletypes.Message):
+    cid = message.chat.id
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    bot.send_message(cid, 'Sending entries...')
+    diary = get_diary(cid)
+    entries = diary.retrieve_all_entries()
+    if entries:
+        for entry in entries :
+            original_message = entry.message
+            text = entry.format(lang)
+            bot.reply_to(original_message, text, parse_mode='HTML')
+    else :
+        bot.send_message(cid, 'No entries yet')
 
 # --------- Record command -------------------------------------
 @bot.message_handler(commands=['rec'])
-def command_record(message):
-    default(message) #NO IMPLEMENTADO
+def command_record(message : teletypes.Message):
+    cid = message.chat.id
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    if diary_exists(cid) :
+        return ContinueHandling()
+    bot.reply_to(message, msg.no_diary)
+    
+@bot.message_handler(commands=['rec'])
+def new_entry(message : teletypes.Message):
+    cid = message.chat.id
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    entry_message = message.reply_to_message
+    if not entry_message : entry_message = message
+    get_diary(cid).add_entry(message.from_user, entry_message, True)
+    bot.reply_to(message, msg.entry_added)
 
 # --------- Modify command -------------------------------------
 @bot.message_handler(commands=['mod'])
-def command_modify(message):
+def command_modify(message : teletypes.Message):
     default(message) #NO IMPLEMENTADO
 
 # --------- Delete diary command -------------------------------------
 @bot.message_handler(commands=['deldiary'])
-def command_deldiary(message):
+def command_deldiary(message : teletypes.Message):
     default(message) #NO IMPLEMENTADO
 
 # --------- Delete entry command -------------------------------------
 @bot.message_handler(commands=['delentry'])
-def command_delentry(message):
+def command_delentry(message : teletypes.Message):
     default(message) #NO IMPLEMENTADO
 
 # ======================================== Privileged Commands =============================================
 # --------- Close bot command --------------------------------
 @bot.message_handler(commands=['q'], func=lambda msg: from_bot_owner(msg))
-def command_quit(message):
+def command_quit(message : teletypes.Message):
     cid = message.chat.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
@@ -149,7 +193,7 @@ def command_quit(message):
     set_user_step(uid, 2)
 
 @bot.message_handler(func=lambda msg:  get_user_step(msg.from_user.id) == 2)
-def command_quitted(message):
+def command_quitted(message : teletypes.Message):
     cid = message.chat.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
@@ -169,7 +213,7 @@ def command_quitted(message):
 
 # --------- Toggle Debug command -----------------------------
 @bot.message_handler(commands=['toggledebug'], func=lambda msg: from_bot_owner(msg))
-def command_debug(message):
+def command_debug(message : teletypes.Message):
     lang = message.from_user.language_code
     msg = messages_get(lang)
     debugginMode = not debugginMode
@@ -180,7 +224,7 @@ def command_debug(message):
 
 # --------- Default ------------------------------------------
 @bot.message_handler(func=lambda msg: not muteStatus)
-def default(message):
+def default(message : teletypes.Message):
     lang = message.from_user.language_code
     msg = messages_get(lang)
     bot.reply_to(message, msg.default)

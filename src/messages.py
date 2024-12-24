@@ -2,10 +2,10 @@ from params import DEFAULT_LANG
 from commands import cms_menu
 
 def messages_get(lang) :
-    msgs = langs_dict[lang]
+    msgs : Messages = langs_dict[lang]
     if not msgs :
         msgs = langs_dict[DEFAULT_LANG]
-    return msgs
+    return msgs 
 
 def commands_text_generator(commands) :
     result = "Commands: \n"
@@ -29,7 +29,7 @@ class Messages :
     warn_debug =            "Bot is under maintenance right now. Try again later"
     debug_on =              "Debug mode on"
     debug_off =             "Debug mode off"
-    permaban =              lambda username: f'User {username} is permabanned'
+    permaban =              lambda self, username: f'User {username} is permabanned'
     help_intro_text =       "Welcome to <b>EsoxDiaryBot</b>. This bot offers you a diary for personal use or any groupchat this bot is added to."
     help_commands_text =    "You can use me through this commands: \n\n" + cms_menu(language)
     ban_info =              "Keep in mind that misuse of the bot such as spam can lead to a temporal ban"
@@ -41,6 +41,12 @@ class Messages :
     quitted =               "Terminating program..."
     quit_cancel =           "Bot closing cancelled"
     default =               "I didn't understand that. Use /help to know what I can do"
+    entry_text_info =       lambda self, date, username, text: f'Date: {date}\n<b>{username}</b> said : \n"{text}"'
+    entry_ending =          lambda self, requestor: f'<i>Entry requested by {requestor}</i>'
+    diary_already_created = "This chat has a diary created already"
+    diary_created =         "Diary created successfully. Use /rec to add an entry to the diary"
+    no_diary =              "There is no diary created for this chat yet. Use /create to create a diary"
+    entry_added =           "Succesfully added entry to diary"
 en_msgs = Messages('en')
 
 # -------------------------------------- SPANISH --------------------------------------
