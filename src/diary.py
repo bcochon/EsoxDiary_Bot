@@ -5,7 +5,7 @@ from params import DEFAULT_LANG
 from params import DIARIES_PATH
 from utils import name_from_user
 from utils import log_exception
-from utils import message_date_string
+from utils import unix_date_string
 from messages import messages_get
 
 __all__ = ['diary_exists', 'create_diary', 'delete_diary', 'get_diary']
@@ -15,19 +15,22 @@ __all__ = ['diary_exists', 'create_diary', 'delete_diary', 'get_diary']
 class Entry :
     def __init__(self, requested_by: teletypes.User, message: teletypes.Message, is_personal: bool = True):
         self.requested_by = requested_by
-        self.message = message
+        self.mid = message.id
+        self.cid = message.chat.id
+        self.text = message.text
+        self.from_user = message.from_user
         self.date = message.date
-        self.type = self.define_type()
+        self.type = self.define_type(message)
         if self.type != 'text' : raise Exception('Non text entries not supported yet')
 
     def __str__(self) :
         return self.format(DEFAULT_LANG)
     
-    def define_type(self) :
-        if self.message.text : return 'text'
-        if self.message.photo : return 'photo'
-        if self.message.video : return 'video'
-        if self.message.voice : return 'voice'
+    def define_type(self, message) :
+        if message.text : return 'text'
+        if message.photo : return 'photo'
+        if message.video : return 'video'
+        if message.voice : return 'voice'
         return None
     
     def format(self, language : str) :
@@ -41,9 +44,9 @@ class Entry :
             return None
     
     def format_text(self, language : str) :
-        date = message_date_string(self.message)
-        author = name_from_user(self.message.from_user)
-        text = self.message.text
+        date = unix_date_string(self.date)
+        author = name_from_user(self.from_user)
+        text = self.text
         requestor = name_from_user(self.requested_by)
         msgs = messages_get(language)
         return f'{msgs.entry_text_info(date, author, text)}\n\n{msgs.entry_ending(requestor)}'
@@ -63,11 +66,15 @@ class Diary :
     def q_entries(self) : len(self.entries_by_date)
 
     def create_entry(self, requested_by: teletypes.User, message: teletypes.Message, is_personal: bool) :
-        self.add_entry(Entry(requested_by, message, is_personal))
+        try:
+            entry = Entry(requested_by, message, is_personal)
+        except Exception as e:
+            raise e
+        else :
+            self.add_entry(entry)
 
     def add_entry(self, entry : Entry) :
         self.entries.append(entry)
-        print(f'Diary {self.cid} entries : {self.entries}')
         self.date_add(entry)
         self.save_diary_to_file()
 

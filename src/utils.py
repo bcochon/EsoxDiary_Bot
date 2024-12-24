@@ -28,8 +28,11 @@ def sent_secs_ago(message : teletypes.Message, secs : int) :
     time_since_mesage = int(time()) - message.date
     return time_since_mesage > secs
 
-def message_date_string(message : teletypes.Message) :
-    return datetime.fromtimestamp(message.date).strftime('%d/%m/%Y %H:%M:%S')
+def message_date_string(message : teletypes.Message, format : str = '%d/%m/%Y %H:%M:%S') :
+    return unix_date_string(message.date, format)
+
+def unix_date_string(date : int, format : str = '%d/%m/%Y %H:%M:%S') :
+    return datetime.fromtimestamp(date).strftime(format)
 
 def user_from_message(message : teletypes.Message) :
     user = message.from_user.username

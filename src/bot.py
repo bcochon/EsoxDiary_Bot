@@ -141,9 +141,9 @@ def retrieve_entries(message : teletypes.Message):
     entries = diary.retrieve_all_entries()
     if entries:
         for entry in entries :
-            original_message = entry.message
             text = entry.format(lang)
-            bot.reply_to(original_message, text, parse_mode='HTML')
+            reply = teletypes.ReplyParameters(message_id=entry.mid, chat_id=entry.cid)
+            bot.send_message(cid, text, parse_mode='HTML', reply_parameters=reply)
     else :
         bot.send_message(cid, 'No entries yet')
 
