@@ -184,11 +184,6 @@ def new_entry(message : teletypes.Message):
         log_exception(e)
         bot.reply_to(message, msg.rec_error)
 
-# --------- Modify command -------------------------------------
-@bot.message_handler(commands=['mod'])
-def command_modify(message : teletypes.Message):
-    default(message) #NO IMPLEMENTADO
-
 # --------- Delete diary command -------------------------------------
 @bot.message_handler(commands=['deldiary'])
 def command_deldiary(message : teletypes.Message):

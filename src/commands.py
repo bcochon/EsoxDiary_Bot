@@ -38,7 +38,6 @@ commands_en = CommandsByLanguage(
         'create'        : 'create diary for this chat',
         'check'         : 'see diary entries',
         'rec'           : 'record entry in this chat diary',
-        'mod'           : 'modify a diary entry',
         'deldiary'      : 'delete this chat diary',
         'delentry'      : 'delete a diary entry'
     }
@@ -61,7 +60,6 @@ commands_es = CommandsByLanguage(
         'create'        : 'crear diario para este chat',
         'check'         : 'ver entradas de diario',
         'rec'           : 'grabar una entrada en el diario de este chat',
-        'mod'           : 'modificar una entrada de diario',
         'deldiary'      : 'eliminar el diario de este chat',
         'delentry'      : 'eliminar una entrada de diario'
     }
