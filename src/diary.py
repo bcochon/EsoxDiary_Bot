@@ -1,8 +1,9 @@
 from telebot import types as teletypes
 import os
 from params import DEFAULT_LANG, DIARIES_PATH
-from utils import name_from_user, log_exception, unix_date_string, get_from_file, save_to_file
+from utils import name_from_user, log_exception, unix_date_string, get_from_file, save_to_file, get_dictionary_from_files, logger, loggerErrors
 from messages import messages_get
+from user_handler import add_diary_to_user, remove_diary_from_user
 from threading import Lock
 
 __all__ = ['diary_exists', 'create_diary', 'delete_diary', 'get_diary']
@@ -67,16 +68,17 @@ class Entry :
 
 
 class Diary :
-    def __init__(self, chat) :
+    def __init__(self, chat : teletypes.Chat) :
         self.cid = chat.id
         self.entries = []
         self.entries_by_date = {}
         self.mutex = Lock()
+        self.type = chat.type
+        self.title = chat.title
+        self.participants = []
         diaries_dict.update({self.cid : self})
         self.save_diary_to_file()
-
-    def q_entries(self) : len(self.entries_by_date)
-
+    
     def create_entry(self, requested_by: teletypes.User, message: teletypes.Message, is_personal: bool) :
         try:
             entry = Entry(requested_by, message, is_personal)
@@ -130,6 +132,16 @@ class Diary :
         with self.mutex :
             save_to_file(path, self)
 
+    def remove_participant(self, uid:int) :
+        if uid in self.participants :
+            self.participants.remove(uid)
+            remove_diary_from_user(uid, self.cid)
+        logger.debug(f'Removed participant {uid} from private diary {self.cid}')
+
+    def remove_all_participant(self) :
+        for uid in self.participants :
+            self.remove_participant(uid)
+
     def delete_diary(self) :
         cid = self.cid
         path = f'{DIARIES_PATH}/{cid}'
@@ -138,12 +150,24 @@ class Diary :
 
 
 class PrivateDiary(Diary) :
-    type = 'private'
-    participants = []
+    def __init__(self, chat : teletypes.Chat) :
+        super().__init__(chat)
+        uid = chat.id
+        self.participants = [uid]
+        add_diary_to_user(uid, self.cid)
+
+    def add_participant(self, uid:int) :
+        logger.debug(f'Cant add participant to private diary {self.cid}')
 
 class GroupDiary(Diary) :
-    type = 'group'
-    participants = []
+    def __init__(self, chat : teletypes.Chat) :
+        super().__init__(chat)
+
+    def add_participant(self, uid:int) :
+        if uid not in self.participants :
+            self.participants.append(uid)
+            add_diary_to_user(uid, self.cid)
+        logger.debug(f'Added participant {uid} to group diary {self.cid}')
 
 
 # ============================================== FUNCTIONS ==============================================
@@ -152,12 +176,17 @@ def diary_exists(chat_id : int) -> bool :
     return chat_id in diaries_dict
 
 def get_diary(chat_id : int) -> PrivateDiary | GroupDiary :
-    return diaries_dict[chat_id]
+    try:
+        diary = diaries_dict[chat_id]
+    except Exception as e:
+        log_exception(e)
+        diary = None
+    return diary
 
 def create_diary(chat : teletypes.Chat) :
     if chat.type == "private" : return PrivateDiary(chat)
     if chat.type == "group" : return GroupDiary(chat)
-    raise Exception('Chat type diary not supported yet')
+    raise Exception('Chat type not supported yet (only private and group chats supported)')
 
 def delete_diary(chat_id : int) :
     diaries_dict[chat_id].remove_diary()
@@ -167,12 +196,9 @@ def get_diary_from_file(cid : int) -> PrivateDiary | GroupDiary | None :
     return get_from_file(path)
 
 def get_diaries_from_files() -> dict :
-    diaries = {}
-    diary_files = os.listdir(DIARIES_PATH)
-    for s_cid in diary_files :
-        cid = int(s_cid)
-        diary = get_diary_from_file(cid)
-        diaries.update({cid : diary})
-    return diaries
+    return get_dictionary_from_files(DIARIES_PATH)
+
+
+# ============================================== START FUNCTIONS ==============================================
 
 diaries_dict = get_diaries_from_files()

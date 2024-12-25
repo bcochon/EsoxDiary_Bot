@@ -2,6 +2,7 @@ from telebot import types as teletypes
 import logging
 import logging.config
 import pickle
+import os
 from params import BOT_OWNER, LOGGER_CONFIG_PATH
 from datetime import datetime
 from time import time
@@ -92,3 +93,12 @@ def get_from_file(path : str) :
         log_exception(e)
         diary = None
     return diary
+
+def get_dictionary_from_files(path) -> dict :
+    dict = {}
+    files = os.listdir(path)
+    for s_key in files :
+        key = int(s_key)
+        value = get_from_file(f'{path}/{key}')
+        dict.update({key : value})
+    return dict

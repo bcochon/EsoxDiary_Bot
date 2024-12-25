@@ -127,8 +127,12 @@ def command_create(message : teletypes.Message):
     if diary_exists(cid) :
         bot.reply_to(message, msg.diary_already_created)
     else :
-        create_diary(message.chat)
-        bot.reply_to(message, msg.diary_created)
+        try:
+            create_diary(message.chat)
+        except:
+            bot.reply_to(message, msg.diary_create_error)
+        else:
+            bot.reply_to(message, msg.diary_created)
 
 # --------- Check command -------------------------------------
 @bot.message_handler(commands=['check'])

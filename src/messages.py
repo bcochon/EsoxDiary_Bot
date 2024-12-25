@@ -48,6 +48,7 @@ class Messages :
     entry_ending =          lambda self, requestor: f'<i>Entry requested by {requestor}</i>'
     diary_already_created = "This chat already has a diary created"
     diary_created =         "Diary created successfully. Use /rec to add an entry to the diary"
+    diary_create_error =    "Ups... couldn't create a diary from this chat. Make sure this is a private or group chat"
     no_diary =              "There is no diary created for this chat yet. Use /create to create a diary"
     entry_added =           "Succesfully added entry to diary"
     rec_error =             "Ups... can't turn that message into an entry. Make sure you are correctly using /rec. "+'For more info, use "/help rec"'
@@ -81,6 +82,7 @@ es_msgs.entry_textreply_info =  lambda username, text: f'Luego de que <b>{userna
 es_msgs.entry_ending =          lambda requestor: f'<i>Entrada grabada por {requestor}</i>'
 es_msgs.diary_already_created = "Este chat ya tiene un diario creado"
 es_msgs.diary_created =         "Diario creado correctamente. Usa /rec para añadir una entrada a este diario"
+es_msgs.diary_create_error =    "Ups... no se pudo crear un diario para este chat. Asegúrate de estar en un chat privado o de grupo"
 es_msgs.no_diary =              "No hay un diario creado para este chat aún. Usa /create para crear un diario"
 es_msgs.entry_added =           "Entrada añadida al diario con éxito"
 es_msgs.rec_error =             "Ups... ese mensaje no puede convertirse en entrada. Asegúrate de estar usando correctamente el comando /rec. "+'Para más información, usa "/help rec"'
