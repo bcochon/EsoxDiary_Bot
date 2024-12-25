@@ -2,11 +2,10 @@ from telebot import types as teletypes
 import logging
 import logging.config
 import pickle
-from params import BOT_OWNER
-from params import LOGGER_CONFIG_PATH
+from params import BOT_OWNER, LOGGER_CONFIG_PATH
 from datetime import datetime
 from time import time
-
+from threading import Lock
 
 logging.config.fileConfig(LOGGER_CONFIG_PATH)
 logger = logging.getLogger('DiaryBot')
@@ -14,6 +13,8 @@ loggerIgnore = logging.getLogger('Ignore')
 loggerErrors = logging.getLogger('Errors')
 
 ALLSCP = ['audio', 'document', 'video', 'videonote', 'voice', 'location', 'contact', 'sticker', 'photo']
+
+message_mutex = Lock()
 
 def log_exception(exception : Exception) :
     loggerErrors.error('Error {0}'.format(str(exception)))
@@ -70,11 +71,24 @@ def message_info_string(message : teletypes.Message):
 
 def save_message_to_file(message : teletypes.Message):
     path = 'test'
-    try:
-        with open(path, 'wb') as f:
-            pickle.dump(message, f)
-    except Exception as e:
-        log_exception(e)
+    with message_mutex :
+        save_to_file(path, message)
 
 def from_bot_owner(message : teletypes.Message) :
     return message.from_user.id == BOT_OWNER
+
+def save_to_file(path : str, data) :
+    try:
+        with open(path, 'wb') as f:
+            pickle.dump(data, f)
+    except Exception as e:
+        log_exception(e)
+
+def get_from_file(path : str) :
+    try:
+        with open(path, 'rb') as f:
+            diary = pickle.load(f)
+    except Exception as e:
+        log_exception(e)
+        diary = None
+    return diary

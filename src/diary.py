@@ -1,12 +1,9 @@
 from telebot import types as teletypes
-import pickle
 import os
-from params import DEFAULT_LANG
-from params import DIARIES_PATH
-from utils import name_from_user
-from utils import log_exception
-from utils import unix_date_string
+from params import DEFAULT_LANG, DIARIES_PATH
+from utils import name_from_user, log_exception, unix_date_string, get_from_file, save_to_file
 from messages import messages_get
+from threading import Lock
 
 __all__ = ['diary_exists', 'create_diary', 'delete_diary', 'get_diary']
 
@@ -74,6 +71,7 @@ class Diary :
         self.cid = chat.id
         self.entries = []
         self.entries_by_date = {}
+        self.mutex = Lock()
         diaries_dict.update({self.cid : self})
         self.save_diary_to_file()
 
@@ -129,11 +127,8 @@ class Diary :
     def save_diary_to_file(self) :
         cid = self.cid
         path = f'{DIARIES_PATH}/{cid}'
-        try:
-            with open(path, 'wb') as f:
-                pickle.dump(self, f)
-        except Exception as e:
-            log_exception(e)
+        with self.mutex :
+            save_to_file(path, self)
 
     def delete_diary(self) :
         cid = self.cid
@@ -169,13 +164,7 @@ def delete_diary(chat_id : int) :
 
 def get_diary_from_file(cid : int) -> PrivateDiary | GroupDiary | None :
     path = f'{DIARIES_PATH}/{cid}'
-    try:
-        with open(path, 'rb') as f:
-            diary = pickle.load(f)
-    except Exception as e:
-        log_exception(e)
-        diary = None
-    return diary
+    return get_from_file(path)
 
 def get_diaries_from_files() -> dict :
     diaries = {}

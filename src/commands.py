@@ -1,5 +1,4 @@
-from params import DEFAULT_LANG
-from params import BOT_OWNER
+from params import DEFAULT_LANG, BOT_OWNER
 from telebot import types as teletypes
 from utils import logger
 

@@ -10,11 +10,7 @@ from messages import messages_get
 import commands
 from params import *
 from utils import *
-from user_handler import check_banned
-from user_handler import check_spam
-from user_handler import get_user_step
-from user_handler import set_user_step
-from user_handler import UserSteps
+from user_handler import check_banned, check_spam, get_user_step, set_user_step, UserSteps
 from diary import *
 
 load_dotenv()
@@ -149,10 +145,10 @@ def retrieve_entries(message : teletypes.Message):
     cid = message.chat.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
-    bot.send_message(cid, msg.check)
     diary = get_diary(cid)
     entries = diary.retrieve_all_entries()
     if entries:
+        bot.send_message(cid, msg.check)
         for entry in entries :
             text = entry.format(lang)
             reply = teletypes.ReplyParameters(message_id=entry.mid, chat_id=entry.cid)
