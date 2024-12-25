@@ -18,7 +18,6 @@ class CustomUserInfo:
         self.step = 0
         self.banned = False
         self.diaries = []
-        self.mutex = threading.Lock()
         self.save_user_to_file()
 
     def __str__(self):
@@ -60,8 +59,7 @@ class CustomUserInfo:
     def save_user_to_file(self) :
         uid = self.uid
         path = f'{USERS_PATH}/{uid}'
-        with self.mutex :
-            save_to_file(path, self)
+        save_to_file(path, self)
 
 
 def unban_all_users(users : dict) :

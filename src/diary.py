@@ -4,7 +4,6 @@ from params import DEFAULT_LANG, DIARIES_PATH
 from utils import name_from_user, log_exception, unix_date_string, get_from_file, save_to_file, get_dictionary_from_files, logger, loggerErrors
 from messages import messages_get
 from user_handler import add_diary_to_user, remove_diary_from_user
-from threading import Lock
 
 __all__ = ['diary_exists', 'create_diary', 'delete_diary', 'get_diary']
 
@@ -72,7 +71,6 @@ class Diary :
         self.cid = chat.id
         self.entries = []
         self.entries_by_date = {}
-        self.mutex = Lock()
         self.type = chat.type
         self.title = chat.title
         self.participants = []
@@ -129,8 +127,7 @@ class Diary :
     def save_diary_to_file(self) :
         cid = self.cid
         path = f'{DIARIES_PATH}/{cid}'
-        with self.mutex :
-            save_to_file(path, self)
+        save_to_file(path, self)
 
     def remove_participant(self, uid:int) :
         if uid in self.participants :

@@ -6,7 +6,6 @@ import os
 from params import BOT_OWNER, LOGGER_CONFIG_PATH
 from datetime import datetime
 from time import time
-from threading import Lock
 
 logging.config.fileConfig(LOGGER_CONFIG_PATH)
 logger = logging.getLogger('DiaryBot')
@@ -14,8 +13,6 @@ loggerIgnore = logging.getLogger('Ignore')
 loggerErrors = logging.getLogger('Errors')
 
 ALLSCP = ['audio', 'document', 'video', 'videonote', 'voice', 'location', 'contact', 'sticker', 'photo']
-
-message_mutex = Lock()
 
 def log_exception(exception : Exception) :
     loggerErrors.error('Error {0}'.format(str(exception)))
@@ -72,8 +69,7 @@ def message_info_string(message : teletypes.Message):
 
 def save_message_to_file(message : teletypes.Message):
     path = 'test'
-    with message_mutex :
-        save_to_file(path, message)
+    save_to_file(path, message)
 
 def from_bot_owner(message : teletypes.Message) :
     return message.from_user.id == BOT_OWNER
