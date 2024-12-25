@@ -10,7 +10,7 @@ from messages import messages_get
 import commands
 from params import *
 from utils import *
-from user_handler import check_banned, check_spam, get_user_step, set_user_step, UserSteps
+from user_handler import *
 from diary import *
 
 load_dotenv()
@@ -134,14 +134,34 @@ def command_create(message : teletypes.Message):
         else:
             bot.reply_to(message, msg.diary_created)
 
+# --------- Create command -------------------------------------
+@bot.message_handler(commands=['join'])
+def command_join(message : teletypes.Message):
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    if message.chat.type != 'group' :
+        bot.reply_to(message, msg.invalid_join)
+        return 1
+    cid = message.chat.id
+    if not diary_exists(cid) :
+        bot.reply_to(message, msg.no_diary)
+        return 2
+    uid = message.from_user.id
+    if user_has_diary(uid):
+        bot.reply_to(message, msg.already_joined)
+        return 3
+    get_diary(cid).add_participant(uid)
+    bot.reply_to(message, msg.joined)
+
+
 # --------- Check command -------------------------------------
 @bot.message_handler(commands=['check'])
 def command_check(message : teletypes.Message):
     cid = message.chat.id
-    lang = message.from_user.language_code
-    msg = messages_get(lang)
     if diary_exists(cid) :
         return ContinueHandling()
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
     bot.reply_to(message, msg.no_diary)
 
 @bot.message_handler(commands=['check'])

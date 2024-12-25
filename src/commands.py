@@ -35,6 +35,7 @@ commands_en = CommandsByLanguage(
     },
     diary = {
         'create'        : 'create diary for this chat',
+        'join'          : 'join this chat diary (groupchats)',
         'check'         : 'see diary entries',
         'rec'           : 'record entry in this chat diary',
         'deldiary'      : 'delete this chat diary',
@@ -57,6 +58,7 @@ commands_es = CommandsByLanguage(
     },
     diary = {
         'create'        : 'crear diario para este chat',
+        'join'          : 'unirse al diario de este chat (grupos)',
         'check'         : 'ver entradas de diario',
         'rec'           : 'grabar una entrada en el diario de este chat',
         'deldiary'      : 'eliminar el diario de este chat',
