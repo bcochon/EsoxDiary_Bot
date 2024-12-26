@@ -50,15 +50,19 @@ class Messages :
     diary_created =         "Diary created successfully. Use /rec to add an entry to the diary"
     diary_create_error =    "Ups... couldn't create a diary from this chat. Make sure this is a private or group chat"
     no_diary =              "There is no diary created for this chat yet. Use /create to create a diary"
+    not_join =              "You have to join this diary to add entries. Use /join to join this diary"
     already_joined =        "You are already part of this diary"
     invalid_join =          "You can only join groupchat diaries"
     joined =                "Succesfully added user to this diary"
+    entry_confirm =         "Select a diary to save this message entry:"
     entry_added =           "Succesfully added entry to diary"
     rec_error =             "Ups... can't turn that message into an entry. Make sure you are correctly using /rec. "+'For more info, use "/help rec"'
     check =                 "Sending entries..."
     no_entries =            "No entries yet for this diary"
-    del_diary_confirm =     "Are you sure you want to delete this diary?"
+    del_diary_confirm =     '<b>WARNING</b>\nAre you sure you want to delete this diary?\nAll the entries will be PERMANENTLY deleted\nSend "/confirm" to delete'
     del_diary =             "Diary deleted"
+    del_diary_group =       "At the moment, users can't delete group diaries"
+    operation_cancel =      "Operation canceled"
 en_msgs = Messages('en')
 
 # -------------------------------------- SPANISH --------------------------------------
@@ -87,6 +91,7 @@ es_msgs.diary_already_created = "Este chat ya tiene un diario creado"
 es_msgs.diary_created =         "Diario creado correctamente. Usa /rec para añadir una entrada a este diario"
 es_msgs.diary_create_error =    "Ups... no se pudo crear un diario para este chat. Asegúrate de estar en un chat privado o de grupo"
 es_msgs.no_diary =              "No hay un diario creado para este chat aún. Usa /create para crear un diario"
+es_msgs.not_join =              "Debes unirte a este diario para añadir entradas. Usa /join para unirte a este diario"
 es_msgs.already_joined =        "Ya eres integrante de este diario"
 es_msgs.invalid_join =          "Solo puedes unirte a diarios de chats grupales"
 es_msgs.joined =                "Usuario añadido al diario con éxito"
@@ -94,5 +99,6 @@ es_msgs.entry_added =           "Entrada añadida al diario con éxito"
 es_msgs.rec_error =             "Ups... ese mensaje no puede convertirse en entrada. Asegúrate de estar usando correctamente el comando /rec. "+'Para más información, usa "/help rec"'
 es_msgs.check =                 "Enviando entradas..."
 es_msgs.no_entries =            "Aún no hay entradas para este diario"
-es_msgs.del_diary_confirm =     "¿Seguro que quieres eliminar este diario?"
+es_msgs.del_diary_confirm =     '<b>ADVERTENCIA</b>\n¿Seguro que quieres eliminar este diario?\nTodas las entradas actuales se eliminarán de manera PERMANENTE\nEnvía "confirm" para eliminar'
 es_msgs.del_diary =             "Diario eliminado"
+es_msgs.del_diary_group =       "Por ahora, los usuarios no pueden eliminar diarios de chats grupales"

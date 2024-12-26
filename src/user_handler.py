@@ -12,6 +12,7 @@ BAN_TIME = 60 #seconds
 class UserSteps :
     DEFAULT = 0
     QUIT = 1
+    DELETE_DIARY = 2
 
 class CustomUserInfo:
     def __init__(self, uid):

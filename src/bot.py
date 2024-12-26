@@ -210,10 +210,32 @@ def new_entry(message : teletypes.Message):
 @bot.message_handler(commands=['deldiary'])
 def command_deldiary(message : teletypes.Message):
     cid = message.chat.id
+    uid = message.from_user.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
-    get_diary(cid).delete_diary()
-    bot.send_message(cid, msg.del_diary)
+    if message.chat.type == 'group':
+        bot.send_message(cid, msg.del_diary_group)
+        return 1
+    bot.send_message(cid, msg.del_diary_confirm)
+    set_user_step(uid, UserSteps.DELETE_DIARY)
+
+@bot.message_handler(func=lambda msg:  get_user_step(msg.from_user.id) == UserSteps.DELETE_DIARY)
+def command_deldiary(message : teletypes.Message):
+    cid = message.chat.id
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    uid = message.from_user.id
+    set_user_step(uid, UserSteps.DEFAULT)
+    if message.text.lower() == 'confirm':
+        try:
+            get_diary(cid).delete_diary()
+        except Exception as e:
+            logger.error("Unexpected error. Couldn't delete diary")
+            loggerErrors.error('Error {0}'.format(str(e)))
+        else:
+            bot.send_message(cid, msg.del_diary)
+    else:
+        bot.reply_to(message, msg.operation_cancel)
 
 # --------- Delete entry command -------------------------------------
 @bot.message_handler(commands=['delentry'])
@@ -245,7 +267,7 @@ def command_quitted(message : teletypes.Message):
             logger.debug("Closing bot...")
         except Exception as e:
             logger.error("Unexpected error. Couldn't close bot")
-            log_exception(e)
+            loggerErrors.error('Error {0}'.format(str(e)))
     else:
         bot.reply_to(message, msg.quit_cancel)
 
