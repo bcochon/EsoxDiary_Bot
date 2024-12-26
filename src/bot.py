@@ -134,25 +134,27 @@ def command_create(message : teletypes.Message):
         else:
             bot.reply_to(message, msg.diary_created)
 
-# --------- Create command -------------------------------------
+# --------- Join command ---------------------------------------
 @bot.message_handler(commands=['join'])
 def command_join(message : teletypes.Message):
     lang = message.from_user.language_code
     msg = messages_get(lang)
-    if message.chat.type != 'group' :
-        bot.reply_to(message, msg.invalid_join)
-        return 1
-    cid = message.chat.id
-    if not diary_exists(cid) :
-        bot.reply_to(message, msg.no_diary)
-        return 2
-    uid = message.from_user.id
-    if user_has_diary(uid):
-        bot.reply_to(message, msg.already_joined)
-        return 3
-    get_diary(cid).add_participant(uid)
-    bot.reply_to(message, msg.joined)
-
+    try:
+        if message.chat.type != 'group' :
+            bot.reply_to(message, msg.invalid_join)
+            return 1
+        cid = message.chat.id
+        if not diary_exists(cid) :
+            bot.reply_to(message, msg.no_diary)
+            return 2
+        uid = message.from_user.id
+        if user_has_diary(uid, cid):
+            bot.reply_to(message, msg.already_joined)
+            return 3
+        get_diary(cid).add_participant(uid)
+        bot.reply_to(message, msg.joined)
+    except Exception as e:
+        loggerErrors.error('Error {0}'.format(str(e)))
 
 # --------- Check command -------------------------------------
 @bot.message_handler(commands=['check'])

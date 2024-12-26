@@ -15,7 +15,7 @@ class Entry :
         self.mid = message.id
         self.text = message.text.replace('/rec','').replace('@EsoxDiary_bot','').strip()
         self.cid = message.chat.id
-        if message.forward_origin.type == 'user' :
+        if message.forward_origin and message.forward_origin.type == 'user' :
             self.date = message.forward_origin.date
             self.from_user = message.forward_origin.sender_user
         else:
@@ -27,18 +27,12 @@ class Entry :
         else:
             self.reply_to_user = None
             self.reply_to_text = None
-        self.type = self.define_type(message)
+        self.type = message.content_type
         if self.type != 'text' : raise Exception('Non text entries not supported yet')
+        if not self.text : raise Exception("Entry text can't be empty")
 
     def __str__(self) :
         return self.format(DEFAULT_LANG)
-    
-    def define_type(self, message) :
-        if message.text : return 'text'
-        if message.photo : return 'photo'
-        if message.video : return 'video'
-        if message.voice : return 'voice'
-        return None
     
     def format(self, language : str) :
         try:
@@ -72,15 +66,14 @@ class Diary :
         self.entries = []
         self.entries_by_date = {}
         self.type = chat.type
-        self.title = chat.title
         self.participants = []
         diaries_dict.update({self.cid : self})
-        self.save_diary_to_file()
     
     def create_entry(self, requested_by: teletypes.User, message: teletypes.Message, is_personal: bool) :
         try:
             entry = Entry(requested_by, message, is_personal)
         except Exception as e:
+            loggerErrors.error('Error {0}'.format(str(e)))
             raise e
         else :
             self.add_entry(entry)
@@ -144,6 +137,7 @@ class Diary :
         path = f'{DIARIES_PATH}/{cid}'
         diaries_dict.pop(cid)
         os.remove(path)
+        self.remove_all_participant()
 
 
 class PrivateDiary(Diary) :
@@ -152,6 +146,8 @@ class PrivateDiary(Diary) :
         uid = chat.id
         self.participants = [uid]
         add_diary_to_user(uid, self.cid)
+        self.title = 'personal'
+        self.save_diary_to_file()
 
     def add_participant(self, uid:int) :
         logger.debug(f'Cant add participant to private diary {self.cid}')
@@ -159,6 +155,8 @@ class PrivateDiary(Diary) :
 class GroupDiary(Diary) :
     def __init__(self, chat : teletypes.Chat) :
         super().__init__(chat)
+        self.title = chat.title
+        self.save_diary_to_file()
 
     def add_participant(self, uid:int) :
         if uid not in self.participants :

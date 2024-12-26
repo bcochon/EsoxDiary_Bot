@@ -5,7 +5,7 @@ import os
 from params import USERS_PATH
 from utils import logger, save_to_file, get_from_file, get_dictionary_from_files
 
-__all__ = ['check_banned', 'check_spam', 'get_user_step', 'set_user_step', 'UserSteps', 'add_diary_to_user', 'remove_diary_from_user', 'user_has_diary']
+__all__ = ['register_user', 'check_banned', 'check_spam', 'get_user_step', 'set_user_step', 'UserSteps', 'add_diary_to_user', 'remove_diary_from_user', 'user_has_diary']
 
 BAN_TIME = 60 #seconds
 
