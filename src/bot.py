@@ -183,28 +183,71 @@ def retrieve_entries(message : teletypes.Message):
         bot.send_message(cid, msg.no_entries)
 
 # --------- Record command -------------------------------------
+rec_callbacks = {}
+
+def rec_markup(uid : int, cid : int) :
+    buttons = [teletypes.InlineKeyboardButton('Personal', callback_data=f'cb_rec_{uid}')]
+    if cid != uid :
+        title = get_diary(cid).title
+        buttons.append(teletypes.InlineKeyboardButton(title, callback_data=f'cb_rec_{cid}'))
+    markup = teletypes.InlineKeyboardMarkup(row_width=1)
+    markup.add(*buttons)
+    return markup
+
 @bot.message_handler(commands=['rec'])
 def command_record(message : teletypes.Message):
     cid = message.chat.id
+    uid = message.from_user.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
-    if diary_exists(cid) :
-        return ContinueHandling()
-    bot.reply_to(message, msg.no_diary)
-    
-@bot.message_handler(commands=['rec'])
-def new_entry(message : teletypes.Message):
+    if not diary_exists(cid) :
+        bot.reply_to(message, msg.no_diary)
+        return 1
+    if not user_has_diary(uid, cid):
+        bot.reply_to(message, msg.not_join)
+        return 2
+    if message.chat.type == 'private' :
+        command_record_private(message)
+        return 3
     try:
-        cid = message.chat.id
-        lang = message.from_user.language_code
-        msg = messages_get(lang)
         entry_message = message.reply_to_message
         if not entry_message : entry_message = message
-        get_diary(cid).create_entry(message.from_user, entry_message, True)
-        bot.reply_to(message, msg.entry_added)
+        get_diary(cid).create_entry(message.from_user, entry_message, False)
     except Exception as e:
-        log_exception(e)
+        loggerErrors.error('Error {0}'.format(str(e)))
         bot.reply_to(message, msg.rec_error)
+    else:
+        bot.reply_to(message, msg.entry_added)
+    return 0
+
+def command_record_private(message : teletypes.Message):
+    lang = message.from_user.language_code
+    msg = messages_get(lang)
+    try:
+        uid = message.from_user.id
+        entry_message = message.reply_to_message
+        if not entry_message : entry_message = message
+        markup_message = bot.reply_to(message, msg.entry_confirm, reply_markup=rec_markup(uid, entry_message.chat.id))
+        rec_callbacks.update({markup_message.id : entry_message})
+    except Exception as e:
+        loggerErrors.error('Error {0}'.format(str(e)))
+        bot.reply_to(message, msg.rec_error)
+
+@bot.callback_query_handler(func=lambda call : call.data.startswith('cb_rec_'))
+def callback_record(call : teletypes.CallbackQuery):
+    try:
+        cid = call.message.chat.id
+        call_id = call.message.id
+        user = call.from_user
+        lang = call.from_user.language_code
+        msg = messages_get(lang)
+        diary_cid = int(call.data.removeprefix('cb_rec_'))
+        entry_message = rec_callbacks.pop(call_id)
+        get_diary(diary_cid).create_entry(user, entry_message, True)
+        bot.edit_message_reply_markup(chat_id=cid, message_id=call_id, reply_markup=teletypes.InlineKeyboardMarkup())
+        bot.reply_to(call.message, msg.entry_added)
+    except Exception as e:
+        loggerErrors.error('Error {0}'.format(str(e)))
 
 # --------- Delete diary command -------------------------------------
 @bot.message_handler(commands=['deldiary'])
