@@ -82,24 +82,23 @@ def command_help_rec(message : teletypes.Message):
     args = message.text.split()
     if args[1].lower() != 'rec':
         return ContinueHandling
-    cid = message.chat.id
+    uid = message.from_user.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
     txt = msg.help_rec + '\n'
     txt += msg.help_rec_disclaimer
-    bot.send_message(cid, txt, parse_mode='HTML')
+    bot.send_message(uid, txt, parse_mode='HTML') # send to private message
 
 @bot.message_handler(commands=['help'])
 def command_help(message : teletypes.Message):
-    cid = message.chat.id
+    uid = message.from_user.id
     lang = message.from_user.language_code
     msg = messages_get(lang)
     txt = msg.help_intro_text + '\n\n'
     txt += msg.help_commands_text + '\n'
     txt += msg.ban_info + '\n\n'
     txt += msg.help_ending
-    bot.send_message(cid, txt, parse_mode='HTML', link_preview_options=teletypes.LinkPreviewOptions(is_disabled=True))  # send the generated help page
-    check_spam(message.from_user.id)
+    bot.send_message(uid, txt, parse_mode='HTML', link_preview_options=teletypes.LinkPreviewOptions(is_disabled=True))  # send to private message
 
 # --------- Mute command -------------------------------------
 @bot.message_handler(commands=['togglemute'])
@@ -245,7 +244,8 @@ def callback_record(call : teletypes.CallbackQuery):
         entry_message = rec_callbacks.pop(call_id)
         get_diary(diary_cid).create_entry(user, entry_message, True)
         bot.edit_message_reply_markup(chat_id=cid, message_id=call_id, reply_markup=teletypes.InlineKeyboardMarkup())
-        bot.reply_to(call.message, msg.entry_added)
+        reply = teletypes.ReplyParameters(message_id=entry_message.id, chat_id=entry_message.chat.id)
+        bot.send_message(diary_cid, msg.entry_added, reply_parameters=reply)
     except Exception as e:
         loggerErrors.error('Error {0}'.format(str(e)))
 
